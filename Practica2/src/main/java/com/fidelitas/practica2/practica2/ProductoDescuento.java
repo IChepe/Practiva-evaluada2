@@ -23,7 +23,7 @@ public class ProductoDescuento extends ProductoBase{
 
     @Override
     public double CalcularPrecioFinal() {
-        return 0.0; //lo dejo vacio para trabajar despues 
+        return getPrecio() - (getPrecio() * Descuento / 100);
     }
     
     

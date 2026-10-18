@@ -1,11 +1,12 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
-
 package com.fidelitas.practica2.practica2;
+
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
+
 /**
  *
  * @author gabri
@@ -14,15 +15,16 @@ public class Practica2 {
 
     public static void main(String[] args) {
         //variable global
-        int menu=0;
-        
+        int menu = 0;
+
         //hacer los arry y las list 
         List<ProductoBase> inventario = new ArrayList<>();
-        
-        
+        List<ProductoBase> carrito = new ArrayList<>();
+        List<Integer> cantidadesCarrito = new ArrayList<>();
+
         Scanner scanner = new Scanner(System.in);
-        do{
-            
+        do {
+
             System.out.println(""
                     + "+--------------------------------+\n"
                     + "|         MENU PRINCIPAL         |\n"
@@ -31,31 +33,35 @@ public class Practica2 {
                     + "| 2 - ver catalogo de productos  |\n"
                     + "| 3 - agregar producto carrito   |\n"
                     + "| 4 - ver carito, total y recibo |\n"
-                    + "| 5 - Salir                      |\n"
+                    + "| 5 - Producto con descuento     |\n"
+                    + "| 6 - Salir                      |\n"
                     + "+--------------------------------+\n"
                     + "Digite una opcion:");
-            
-            try{
-                menu=scanner.nextInt();
-                switch(menu){
+
+            try {
+                menu = scanner.nextInt();
+                switch (menu) {
                     case 1:
                         System.out.println(""
-                        + "+--------------------------------+\n"
-                        + "|         Agregar producto       |\n");
+                                + "+--------------------------------+\n"
+                                + "|         Agregar producto       |\n");
                         System.out.println("ingrese el nombre del producto");
-                        String nombre=scanner.nextLine();
+                        String nombre = scanner.nextLine();
+                        scanner.nextLine();
+
                         System.out.println("ingrese el precio ");
-                        double precio= scanner.nextDouble();
-                        
+                        double precio = scanner.nextDouble();
+
                         System.out.println("ingrese la cantidad de existencias");
-                        int cantidad= scanner.nextInt();
-                        
-                        if(precio<0 || cantidad <0 ){
+                        int cantidad = scanner.nextInt();
+
+                        if (precio < 0 || cantidad < 0) {
                             System.out.println("\n"
-                                    +"el precio o la cantidad no pueden ser negativos ");
+                                    + "el precio o la cantidad no pueden ser negativos ");
+                            break;
                         }
                         System.out.println("ingrese el numero de identificacion ");
-                        int identificacion= scanner.nextInt();
+                        int identificacion = scanner.nextInt();
                         //creo el objett¿o
                         Producto nuevoProducto = new Producto(identificacion, nombre, precio, cantidad);
                         //agregar al array list
@@ -64,44 +70,133 @@ public class Practica2 {
                         //agregar producto 
                         break;
                     case 2:
-                        //ver catalogo 
-                        
+                        if (inventario.isEmpty()) {
+                            System.out.println("No hay productos registrados");
+                        } else {
+                            for (ProductoBase productoActual : inventario) {
+                                System.out.println("Codigo: " + productoActual.getId());
+                                System.out.println("Nombre: " + productoActual.getNombre());
+                                System.out.println("Precio: " + productoActual.CalcularPrecioFinal());
+                                System.out.println("Existencias: " + productoActual.getCantidadInventario());
+                                System.out.println("-----------------------------");
+                            }
+                        }
+
                         break;
                     case 3:
-                        //agregar producto 
+                        System.out.println("Ingrese el codigo del producto");
+                        int codigoBuscado = scanner.nextInt();
+
+                        System.out.println("Ingrese la cantidad que desea comprar");
+                        int cantidadCompra = scanner.nextInt();
+
+                        ProductoBase productoEncontrado = null;
+
+                        for (ProductoBase p : inventario) {
+                            if (p.getId() == codigoBuscado) {
+                                productoEncontrado = p;
+                                break;
+                            }
+                        }
+
+                        if (cantidadCompra <= 0) {
+                            System.out.println("La cantidad debe ser mayor a cero");
+                        } else if (productoEncontrado == null) {
+                            System.out.println("Producto no encontrado");
+                        } else if (cantidadCompra > productoEncontrado.getCantidadInventario()) {
+                            System.out.println("No hay suficientes existencias");
+                        } else {
+                            carrito.add(productoEncontrado);
+                            cantidadesCarrito.add(cantidadCompra);
+
+                            productoEncontrado.setCantidadInventario(
+                                    productoEncontrado.getCantidadInventario() - cantidadCompra
+                            );
+
+                            System.out.println("Producto agregado al carrito");
+                        }
                         break;
                     case 4:
-                        //recibo 
+                        if (carrito.isEmpty()) {
+                            System.out.println("El carrito esta vacio");
+                        } else {
+                            double total = 0;
+
+                            System.out.println("------ RECIBO DE COMPRA ------");
+
+                            for (int i = 0; i < carrito.size(); i++) {
+                                ProductoBase p = carrito.get(i);
+                                int unidades = cantidadesCarrito.get(i);
+
+                                double subtotal = p.CalcularPrecioFinal() * unidades;
+
+                                System.out.println("Producto: " + p.getNombre());
+                                System.out.println("Cantidad: " + unidades);
+                                System.out.println("Subtotal: " + subtotal);
+                                System.out.println("-----------------------------");
+
+                                total += subtotal;
+                            }
+
+                            System.out.println("TOTAL A PAGAR: " + total);
+
+                            carrito.clear();
+                            cantidadesCarrito.clear();
+                        }
                         break;
                     case 5:
+
+                        System.out.println("Ingrese el nombre del producto");
+                        scanner.nextLine();
+                        String nombreD = scanner.nextLine();
+
+                        System.out.println("Ingrese el precio");
+                        double precioD = scanner.nextDouble();
+
+                        System.out.println("Ingrese las existencias");
+                        int cantidadD = scanner.nextInt();
+
+                        System.out.println("Ingrese el codigo");
+                        int codigoD = scanner.nextInt();
+
+                        System.out.println("Ingrese el descuento de 0 a 100");
+                        double descuentoD = scanner.nextDouble();
+
+                        if (precioD < 0 || cantidadD < 0 || descuentoD < 0 || descuentoD > 100) {
+                            System.out.println("Valores no validos");
+                        } else {
+                            inventario.add(new ProductoDescuento(
+                                    codigoD, nombreD, precioD, cantidadD, descuentoD
+                            ));
+
+                            System.out.println("Producto con descuento agregado");
+                        }
+                        break;
+
+                    case 6:
                         System.out.println("gracias por usar el programa");
                         break;
-                    default://si usa un 6 o algo mas 
+
+                    default:
                         System.out.println("opcion no valida ");
                         break;
-                    
-                    
-                    
                 }//fin swich 
-            //menu =0; 
-            //en caso que sea null 
-            }catch(NullPointerException e){//se deja aca no recuerdo si habbia que importar una libreria
-                menu=0;
-                System.out.println("error nulo "+e.getMessage() );
+                //menu =0; 
+                //en caso que sea null 
+            } catch (NullPointerException e) {//se deja aca no recuerdo si habbia que importar una libreria
+                menu = 0;
+                System.out.println("error nulo " + e.getMessage());
                 //creo que este era para text 
-            }catch(NumberFormatException e){
-                menu=0;
+            } catch (NumberFormatException e) {
+                menu = 0;
                 System.out.println("error no se pueden usar letras");
                 //recetear 
-                
-            }finally{
+
+            } finally {
                 System.out.println("por favor usar una opcion valida");
             }
-            
-        
-        
-        }while(menu!=5);
-        
+
+        } while (menu != 6);
 
     }//fin de clase main 
 }
